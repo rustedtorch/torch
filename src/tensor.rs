@@ -1,7 +1,6 @@
 use super::function;
 
 use num_traits::Num;
-use std::fmt;
 
 pub struct Storage<T: Num> {
     elements: Vec<T>,
@@ -13,59 +12,43 @@ pub struct Tensor<T: Num> {
     src_fn: Option<Box<function::Function>>,
 }
 
-impl<T: Num + std::fmt::Debug> fmt::Debug for Tensor<T> {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "tensor(");
-        match self.dimensions.len() {
-            0 => {
-                write!(f, "{:?}", self.storage.elements[0]);
-            }
-            1 => {
-                let mut index = 0usize;
-                write!(f, "[");
-                for i in 0..self.dimensions[0] {
-                    write!(f, "{:?}, ", self.storage.elements[index]);
-                    index += 1usize;
-                }
-                write!(f, "]");
-            }
-            2 => {
-                let mut index = 0usize;
-                write!(f, "[");
-                for i in 0..self.dimensions[0] {
-                    write!(f, "[");
-                    for i in 0..self.dimensions[1] {
-                        write!(f, "{:?}, ", self.storage.elements[index]);
-                        index += 1usize;
-                    }
-                    write!(f, "]");
-                }
-                write!(f, "]");
-            }
-            3 => {
-                let mut index = 0usize;
-                write!(f, "[");
-                for i in 0..self.dimensions[0] {
-                    write!(f, "[");
-                    for i in 0..self.dimensions[1] {
-                        write!(f, "[");
-                        for i in 0..self.dimensions[2] {
-                            write!(f, "{:?}, ", self.storage.elements[index]);
-                            index += 1usize;
-                        }
-                        write!(f, "]");
-                    }
-                    write!(f, "]");
-                }
-                write!(f, "]");
-            }
-            _ => panic!("Can't display debug format for tensors with more than 3 dimensions"),
-        };
-        write!(f, ")")
+impl<T: 'static + Clone + Num + std::fmt::Debug> std::fmt::Debug for Tensor<T> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        let mut rendered = vec![];
+        rendered.push(format!("tensor("));
+        self.fmt_recursive(&mut rendered, 0, 0);
+        rendered.push(format!(")"));
+        write!(f, "{}", rendered.join(""))
     }
 }
 
-impl<T: 'static + Clone + Num> Tensor<T> {
+impl<T: 'static + Clone + Num + std::fmt::Debug> Tensor<T> {
+    fn fmt_recursive(&self, rendered: &mut Vec<String>, dim_index: usize, index: usize) -> usize {
+        if self.dimensions.len() == 0 {
+            rendered.push(format!("{:?}, ", self.storage.elements[0]));
+            return 0;
+        }
+        rendered.push(format!("["));
+        let last_dim = dim_index == self.dimensions.len() - 1;
+        let mut local_index = index;
+        let length = self.dimensions[dim_index];
+        for i in 0..length {
+            if last_dim {
+                rendered.push(format!("{:?}", self.storage.elements[local_index]));
+                if i < length - 1 {
+                    rendered.push(format!(", "));
+                }
+                local_index += 1;
+            } else {
+                local_index += self.fmt_recursive(rendered, dim_index + 1, local_index);
+                if i < length - 1 {
+                    rendered.push(format!(", "));
+                }
+            }
+        }
+        rendered.push(format!("]"));
+        local_index
+    }
     pub fn new_from_cube(cube: Vec<Vec<Vec<T>>>) -> Tensor<T> {
         let mut storage = Storage { elements: vec![] };
         let mut dimensions = vec![cube.len(), cube[0].len(), cube[0][0].len()];
@@ -137,3 +120,9 @@ impl<T: 'static + Clone + Num> Tensor<T> {
         })
     }
 }
+
+// macro_rules! tensor {
+//     ( $( $x:expr ),* ) => {
+
+//     };
+// }
