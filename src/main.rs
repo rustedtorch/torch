@@ -1,3 +1,10 @@
+extern crate torch;
+
+use torch::*;
+
 fn main() {
-    println!("Hello, world!");
+    match test() {
+        Err(message) => panic!(message),
+        _ => (),
+    };
 }
