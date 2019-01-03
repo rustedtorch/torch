@@ -66,58 +66,6 @@ impl<T: 'static + Clone + Num + std::fmt::Debug> Tensor<T> {
             src_fn: None,
         }
     }
-    pub fn new_from_cube(cube: Vec<Vec<Vec<T>>>) -> Tensor<T> {
-        let mut storage = Storage { elements: vec![] };
-        let mut dimensions = vec![cube.len(), cube[0].len(), cube[0][0].len()];
-        for matrix in cube {
-            for vector in matrix {
-                for scalar in vector {
-                    storage.elements.push(scalar);
-                }
-            }
-        }
-        Tensor {
-            storage: Box::new(storage),
-            dimensions,
-            src_fn: None,
-        }
-    }
-    pub fn new_from_matrix(matrix: Vec<Vec<T>>) -> Tensor<T> {
-        let mut storage = Storage { elements: vec![] };
-        let mut dimensions = vec![matrix.len(), matrix[0].len()];
-        for vector in matrix {
-            for scalar in vector {
-                storage.elements.push(scalar);
-            }
-        }
-        Tensor {
-            storage: Box::new(storage),
-            dimensions,
-            src_fn: None,
-        }
-    }
-    pub fn new_from_vector(vector: Vec<T>) -> Tensor<T> {
-        let mut storage = Storage { elements: vec![] };
-        let mut dimensions = vec![vector.len()];
-        for scalar in vector {
-            storage.elements.push(scalar);
-        }
-        Tensor {
-            storage: Box::new(storage),
-            dimensions,
-            src_fn: None,
-        }
-    }
-    pub fn new_from_scalar(scalar: T) -> Tensor<T> {
-        let mut storage = Storage { elements: vec![] };
-        let mut dimensions = vec![];
-        storage.elements.push(scalar);
-        Tensor {
-            storage: Box::new(storage),
-            dimensions,
-            src_fn: None,
-        }
-    }
     pub fn add(&self, other: Tensor<T>) -> Result<Tensor<T>, &'static str> {
         if self.dimensions != other.dimensions {
             return Err("Can't add tensors of different dimensions");
