@@ -1,4 +1,4 @@
-use super::function;
+use super::function::{AddFunction, Function};
 
 use num_traits::Num;
 
@@ -9,7 +9,7 @@ pub struct Storage<T: Num> {
 pub struct Tensor<T: Num> {
     storage: Box<Storage<T>>,
     dimensions: Vec<usize>,
-    src_fn: Option<Box<function::Function>>,
+    src_fn: Option<Box<Function>>,
 }
 
 impl<T: 'static + Clone + Num + std::fmt::Debug> std::fmt::Debug for Tensor<T> {
@@ -124,13 +124,7 @@ impl<T: 'static + Clone + Num + std::fmt::Debug> Tensor<T> {
         Ok(Tensor {
             storage: Box::new(Storage { elements: result }),
             dimensions: self.dimensions.iter().cloned().collect(),
-            src_fn: Some(Box::new(function::AddFunction { factor: other })),
+            src_fn: Some(Box::new(AddFunction { factor: other })),
         })
     }
 }
-
-// macro_rules! tensor {
-//     ( $( $x:expr ),* ) => {
-
-//     };
-// }
