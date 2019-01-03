@@ -3,8 +3,5 @@ name = "torch"
 version = "0.1.0"
 authors = ["Adrian Punga <adrian.punga@ejobsgroup.ro>"]
 
-# [lib]
-# proc-macro = true
-
 [dependencies]
 num-traits = "0.2.6"

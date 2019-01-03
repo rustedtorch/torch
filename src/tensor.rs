@@ -57,6 +57,15 @@ impl<T: 'static + Clone + Num + std::fmt::Debug> Tensor<T> {
         rendered.push(format!("]"));
         local_index
     }
+    pub fn new(flattened_data: Vec<T>, dimensions: Vec<usize>) -> Tensor<T> {
+        Tensor {
+            storage: Box::new(Storage {
+                elements: flattened_data,
+            }),
+            dimensions,
+            src_fn: None,
+        }
+    }
     pub fn new_from_cube(cube: Vec<Vec<Vec<T>>>) -> Tensor<T> {
         let mut storage = Storage { elements: vec![] };
         let mut dimensions = vec![cube.len(), cube[0].len(), cube[0][0].len()];
