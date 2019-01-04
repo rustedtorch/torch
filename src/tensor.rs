@@ -1,15 +1,58 @@
 use super::function::{AddFunction, Function};
 
 use num_traits::Num;
+use std::rc::Rc;
+
+// <CUSTOM-ERROR>
+
+use std::error;
+use std::fmt;
+
+pub type Result<T> = std::result::Result<T, TensorError>;
+
+#[derive(Debug, Clone)]
+pub struct TensorError {
+    message: &'static str,
+}
+
+impl fmt::Display for TensorError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "tensor error: {}", self.message)
+    }
+}
+
+impl error::Error for TensorError {
+    fn cause(&self) -> Option<&error::Error> {
+        None
+    }
+}
+
+// </CUSTOM-ERROR>
 
 pub struct Storage<T: Num> {
     elements: Vec<T>,
 }
 
 pub struct Tensor<T: Num> {
-    storage: Box<Storage<T>>,
+    storage: Rc<Storage<T>>,
     dimensions: Vec<usize>,
     src_fn: Option<Box<Function>>,
+}
+
+impl<T> Clone for Tensor<T>
+where
+    T: 'static + Clone + Num + std::fmt::Debug,
+{
+    fn clone(&self) -> Tensor<T> {
+        Tensor {
+            storage: self.storage.clone(),
+            dimensions: self.dimensions.iter().cloned().collect(),
+            src_fn: match &self.src_fn {
+                Some(src_fn_ref) => Some((*src_fn_ref).clone()),
+                None => None,
+            },
+        }
+    }
 }
 
 impl<T> std::fmt::Debug for Tensor<T>
@@ -68,16 +111,18 @@ where
     }
     pub fn new(flattened_data: Vec<T>, dimensions: Vec<usize>) -> Tensor<T> {
         Tensor {
-            storage: Box::new(Storage {
+            storage: Rc::new(Storage {
                 elements: flattened_data,
             }),
             dimensions,
             src_fn: None,
         }
     }
-    pub fn add(&self, other: Tensor<T>) -> Result<Tensor<T>, &'static str> {
+    pub fn add(&self, other: &Tensor<T>) -> Result<Tensor<T>> {
         if self.dimensions != other.dimensions {
-            return Err("Can't add tensors of different dimensions");
+            return Err(TensorError {
+                message: "Can't add tensors of different dimensions",
+            });
         }
         let mut result = vec![];
         for i in 0..self.storage.elements.len() {
@@ -88,9 +133,33 @@ where
             );
         }
         Ok(Tensor {
-            storage: Box::new(Storage { elements: result }),
+            storage: Rc::new(Storage { elements: result }),
             dimensions: self.dimensions.iter().cloned().collect(),
-            src_fn: Some(Box::new(AddFunction { factor: other })),
+            src_fn: Some(Box::new(AddFunction {
+                factor: other.clone(),
+            })),
+        })
+    }
+    pub fn mul(&self, other: &Tensor<T>) -> Result<Tensor<T>> {
+        if self.dimensions != other.dimensions {
+            return Err(TensorError {
+                message: "Can't multiply tensors of unmatching dimensions",
+            });
+        }
+        let mut result = vec![];
+        for i in 0..self.storage.elements.len() {
+            result.push(
+                self.storage.elements[i]
+                    .clone()
+                    .add(other.storage.elements[i].clone()),
+            );
+        }
+        Ok(Tensor {
+            storage: Rc::new(Storage { elements: result }),
+            dimensions: self.dimensions.iter().cloned().collect(),
+            src_fn: Some(Box::new(AddFunction {
+                factor: other.clone(),
+            })),
         })
     }
 }
