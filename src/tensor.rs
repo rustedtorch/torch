@@ -39,11 +39,11 @@ where
         indent: usize,
     ) -> usize {
         if self.dimensions.len() == 0 {
-            rendered.push(format!("{:?}, ", self.storage.elements[0]));
+            rendered.push(format!("{:?}", self.storage.elements[0]));
             return 0;
         }
         rendered.push(format!("["));
-        let last_dim = dim_index == self.dimensions.len() - 1;
+        let last_dim = dim_index + 1 == self.dimensions.len();
         let mut local_index = index;
         let length = self.dimensions[dim_index];
         for i in 0..length {
@@ -54,9 +54,12 @@ where
                 }
                 local_index += 1;
             } else {
+                rendered.push(format!("\n{}", " ".repeat(indent + 1)));
                 local_index = self.fmt_recursive(rendered, dim_index + 1, local_index, indent + 1);
                 if i + 1 < length {
-                    rendered.push(format!(",\n{}", " ".repeat(indent + 1)));
+                    rendered.push(format!(","));
+                } else {
+                    rendered.push(format!("\n{}", " ".repeat(indent)));
                 }
             }
         }
