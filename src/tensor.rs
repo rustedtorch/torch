@@ -12,7 +12,10 @@ pub struct Tensor<T: Num> {
     src_fn: Option<Box<Function>>,
 }
 
-impl<T: 'static + Clone + Num + std::fmt::Debug> std::fmt::Debug for Tensor<T> {
+impl<T> std::fmt::Debug for Tensor<T>
+where
+    T: 'static + Clone + Num + std::fmt::Debug,
+{
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         let mut rendered = vec![];
         let header = format!("tensor(");
@@ -24,7 +27,10 @@ impl<T: 'static + Clone + Num + std::fmt::Debug> std::fmt::Debug for Tensor<T> {
     }
 }
 
-impl<T: 'static + Clone + Num + std::fmt::Debug> Tensor<T> {
+impl<T> Tensor<T>
+where
+    T: 'static + Clone + Num + std::fmt::Debug,
+{
     fn fmt_recursive(
         &self,
         rendered: &mut Vec<String>,
