@@ -41,7 +41,7 @@ pub struct Tensor<T: Num> {
 
 impl<T> Clone for Tensor<T>
 where
-    T: 'static + Clone + Num + std::fmt::Debug,
+    T: 'static + Clone + Num + fmt::Debug,
 {
     fn clone(&self) -> Tensor<T> {
         Tensor {
@@ -55,11 +55,11 @@ where
     }
 }
 
-impl<T> std::fmt::Debug for Tensor<T>
+impl<T> fmt::Debug for Tensor<T>
 where
-    T: 'static + Clone + Num + std::fmt::Debug,
+    T: 'static + Clone + Num + fmt::Debug,
 {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut rendered = vec![];
         let header = format!("tensor(");
         let header_len = header.len();
@@ -72,7 +72,7 @@ where
 
 impl<T> Tensor<T>
 where
-    T: 'static + Clone + Num + std::fmt::Debug,
+    T: 'static + Clone + Num + fmt::Debug,
 {
     fn fmt_recursive(
         &self,

@@ -1,6 +1,8 @@
 extern crate num_traits;
 use num_traits::Num;
 
+use std::fmt;
+
 pub mod function;
 pub mod tensor;
 
@@ -9,12 +11,18 @@ pub enum Data<T> {
     Vector(Vec<Data<T>>),
 }
 
-pub fn flatten<T: 'static + Num + Clone + std::fmt::Debug>(data: Data<T>) -> tensor::Tensor<T> {
+pub fn flatten<T>(data: Data<T>) -> tensor::Tensor<T>
+where
+    T: 'static + Num + Clone + fmt::Debug,
+{
     let (flattened_data, dimensions) = flatten_recursive(data);
     tensor::Tensor::new(flattened_data, dimensions)
 }
 
-pub fn flatten_recursive<T>(data: Data<T>) -> (Vec<T>, Vec<usize>) {
+pub fn flatten_recursive<T>(data: Data<T>) -> (Vec<T>, Vec<usize>)
+where
+    T: 'static + Num + Clone + fmt::Debug,
+{
     match data {
         Data::Item(item) => (vec![item], vec![]),
         Data::Vector(vector) => {
