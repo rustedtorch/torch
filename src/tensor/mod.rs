@@ -1,7 +1,15 @@
-use super::function::{AddFunction, Function};
+pub mod ops;
 
 use num_traits::Num;
 use std::rc::Rc;
+
+pub trait Scalar: 'static + Clone + fmt::Debug + Num {}
+
+impl Scalar for f64 {}
+impl Scalar for f32 {}
+impl Scalar for i64 {}
+impl Scalar for i32 {}
+impl Scalar for i16 {}
 
 // <CUSTOM-ERROR>
 
@@ -33,16 +41,17 @@ pub struct Storage<T: Num> {
     elements: Vec<T>,
 }
 
+pub trait Function {
+    fn clone(&self) -> Box<dyn Function>;
+}
+
 pub struct Tensor<T: Num> {
     storage: Rc<Storage<T>>,
     dimensions: Vec<usize>,
     src_fn: Option<Box<Function>>,
 }
 
-impl<T> Clone for Tensor<T>
-where
-    T: 'static + Clone + Num + fmt::Debug,
-{
+impl<T: Scalar> Clone for Tensor<T> {
     fn clone(&self) -> Tensor<T> {
         Tensor {
             storage: self.storage.clone(),
@@ -55,10 +64,7 @@ where
     }
 }
 
-impl<T> fmt::Debug for Tensor<T>
-where
-    T: 'static + Clone + Num + fmt::Debug,
-{
+impl<T: Scalar> fmt::Debug for Tensor<T> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut rendered = vec![];
         let header = format!("tensor(");
@@ -70,10 +76,7 @@ where
     }
 }
 
-impl<T> Tensor<T>
-where
-    T: 'static + Clone + Num + fmt::Debug,
-{
+impl<T: Scalar> Tensor<T> {
     fn fmt_recursive(
         &self,
         rendered: &mut Vec<String>,
@@ -117,49 +120,5 @@ where
             dimensions,
             src_fn: None,
         }
-    }
-    pub fn add(&self, other: &Tensor<T>) -> Result<Tensor<T>> {
-        if self.dimensions != other.dimensions {
-            return Err(TensorError {
-                message: "Can't add tensors of different dimensions",
-            });
-        }
-        let mut result = vec![];
-        for i in 0..self.storage.elements.len() {
-            result.push(
-                self.storage.elements[i]
-                    .clone()
-                    .add(other.storage.elements[i].clone()),
-            );
-        }
-        Ok(Tensor {
-            storage: Rc::new(Storage { elements: result }),
-            dimensions: self.dimensions.iter().cloned().collect(),
-            src_fn: Some(Box::new(AddFunction {
-                factor: other.clone(),
-            })),
-        })
-    }
-    pub fn mul(&self, other: &Tensor<T>) -> Result<Tensor<T>> {
-        if self.dimensions != other.dimensions {
-            return Err(TensorError {
-                message: "Can't multiply tensors of unmatching dimensions",
-            });
-        }
-        let mut result = vec![];
-        for i in 0..self.storage.elements.len() {
-            result.push(
-                self.storage.elements[i]
-                    .clone()
-                    .add(other.storage.elements[i].clone()),
-            );
-        }
-        Ok(Tensor {
-            storage: Rc::new(Storage { elements: result }),
-            dimensions: self.dimensions.iter().cloned().collect(),
-            src_fn: Some(Box::new(AddFunction {
-                factor: other.clone(),
-            })),
-        })
     }
 }

@@ -1,9 +1,5 @@
 extern crate num_traits;
-use num_traits::Num;
 
-use std::fmt;
-
-pub mod function;
 pub mod tensor;
 
 pub enum Data<T> {
@@ -11,18 +7,12 @@ pub enum Data<T> {
     Vector(Vec<Data<T>>),
 }
 
-pub fn flatten<T>(data: Data<T>) -> tensor::Tensor<T>
-where
-    T: 'static + Num + Clone + fmt::Debug,
-{
+pub fn flatten<T: tensor::Scalar>(data: Data<T>) -> tensor::Tensor<T> {
     let (flattened_data, dimensions) = flatten_recursive(data);
     tensor::Tensor::new(flattened_data, dimensions)
 }
 
-pub fn flatten_recursive<T>(data: Data<T>) -> (Vec<T>, Vec<usize>)
-where
-    T: 'static + Num + Clone + fmt::Debug,
-{
+pub fn flatten_recursive<T: tensor::Scalar>(data: Data<T>) -> (Vec<T>, Vec<usize>) {
     match data {
         Data::Item(item) => (vec![item], vec![]),
         Data::Vector(vector) => {
@@ -112,6 +102,7 @@ macro_rules! tensor_i16 {
 }
 
 #[macro_export(local_inner_macros)]
+#[doc(hidden)]
 macro_rules! tensor_internal {
     // Done with trailing comma.
     ($type:ty, @array [$($elems:expr,)*]) => {
@@ -161,6 +152,7 @@ macro_rules! tensor_internal {
 }
 
 #[macro_export]
+#[doc(hidden)]
 macro_rules! tensor_internal_vec {
     ($($content:tt)*) => {
         $crate::Data::Vector(vec![$($content)*])
@@ -168,6 +160,7 @@ macro_rules! tensor_internal_vec {
 }
 
 #[macro_export]
+#[doc(hidden)]
 macro_rules! tensorunexpected {
     () => {};
 }
