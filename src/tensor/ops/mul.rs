@@ -15,9 +15,9 @@ impl<T: Scalar> Function for MulFunction<T> {
 impl<T: Scalar> Tensor<T> {
     pub fn mul(&self, other: &Tensor<T>) -> Result<Tensor<T>> {
         if self.dimensions != other.dimensions {
-            return Err(TensorError {
-                message: "Can't multiply tensors of unmatching dimensions",
-            });
+            return Err(error::TensorError::new(
+                "Can't multiply tensors of unmatching dimensions",
+            ));
         }
         let mut result = vec![];
         for i in 0..self.storage.elements.len() {

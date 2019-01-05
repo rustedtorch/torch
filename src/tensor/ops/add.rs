@@ -15,9 +15,9 @@ impl<T: Scalar> Function for AddFunction<T> {
 impl<T: Scalar> Tensor<T> {
     pub fn add(&self, other: &Tensor<T>) -> Result<Tensor<T>> {
         if self.dimensions != other.dimensions {
-            return Err(TensorError {
-                message: "Can't add tensors of different dimensions",
-            });
+            return Err(error::TensorError::new(
+                "Can't add tensors of different dimensions",
+            ));
         }
         let mut result = vec![];
         for i in 0..self.storage.elements.len() {
