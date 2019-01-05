@@ -2,6 +2,7 @@ pub mod debug;
 pub mod error;
 pub mod ops;
 pub mod scalar;
+pub mod tensor_macro;
 
 use self::scalar::*;
 use std::rc::Rc;
