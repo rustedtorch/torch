@@ -2,7 +2,7 @@ use super::*;
 
 use std::fmt;
 
-impl<T: Scalar> fmt::Debug for Tensor<T> {
+impl<T: Scalar<T>> fmt::Debug for Tensor<T> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut rendered = vec![];
         let header = format!("tensor(");
@@ -14,7 +14,7 @@ impl<T: Scalar> fmt::Debug for Tensor<T> {
     }
 }
 
-impl<T: Scalar> Tensor<T> {
+impl<T: Scalar<T>> Tensor<T> {
     fn fmt_recursive(
         &self,
         rendered: &mut Vec<String>,

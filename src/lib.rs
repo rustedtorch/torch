@@ -1,5 +1,3 @@
-extern crate num_traits;
-
 pub mod tensor;
 
 pub enum Data<T> {
@@ -7,12 +5,12 @@ pub enum Data<T> {
     Vector(Vec<Data<T>>),
 }
 
-pub fn flatten<T: tensor::scalar::Scalar>(data: Data<T>) -> tensor::Tensor<T> {
+pub fn flatten<T: tensor::scalar::Scalar<T>>(data: Data<T>) -> tensor::Tensor<T> {
     let (flattened_data, dimensions) = flatten_recursive(data);
     tensor::Tensor::new(flattened_data, dimensions)
 }
 
-pub fn flatten_recursive<T: tensor::scalar::Scalar>(data: Data<T>) -> (Vec<T>, Vec<usize>) {
+pub fn flatten_recursive<T: tensor::scalar::Scalar<T>>(data: Data<T>) -> (Vec<T>, Vec<usize>) {
     match data {
         Data::Item(item) => (vec![item], vec![]),
         Data::Vector(vector) => {

@@ -8,7 +8,7 @@ use std::rc::Rc;
 
 pub type Result<T> = std::result::Result<T, error::TensorError>;
 
-pub struct Storage<T: Scalar> {
+pub struct Storage<T: Scalar<T>> {
     elements: Vec<T>,
 }
 
@@ -16,13 +16,13 @@ pub trait Function {
     fn clone(&self) -> Box<dyn Function>;
 }
 
-pub struct Tensor<T: Scalar> {
+pub struct Tensor<T: Scalar<T>> {
     storage: Rc<Storage<T>>,
     dimensions: Vec<usize>,
     src_fn: Option<Box<Function>>,
 }
 
-impl<T: Scalar> Clone for Tensor<T> {
+impl<T: Scalar<T>> Clone for Tensor<T> {
     fn clone(&self) -> Tensor<T> {
         Tensor {
             storage: self.storage.clone(),
@@ -35,7 +35,7 @@ impl<T: Scalar> Clone for Tensor<T> {
     }
 }
 
-impl<T: Scalar> Tensor<T> {
+impl<T: Scalar<T>> Tensor<T> {
     pub fn new(flattened_data: Vec<T>, dimensions: Vec<usize>) -> Tensor<T> {
         Tensor {
             storage: Rc::new(Storage {
