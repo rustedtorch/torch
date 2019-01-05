@@ -21,7 +21,9 @@ impl<T: Scalar<T>> Tensor<T> {
         }
         let mut result = vec![];
         for i in 0..self.storage.elements.len() {
-            result.push(self.storage.elements[i].clone() * other.storage.elements[i].clone());
+            let a = self.storage.elements[i].clone();
+            let b = other.storage.elements[i].clone();
+            result.push(a * b);
         }
         Ok(Tensor {
             storage: Rc::new(Storage { elements: result }),
