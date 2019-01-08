@@ -4,3 +4,4 @@ version = "0.1.0"
 authors = ["Adrian Punga <adrian.punga@ejobsgroup.ro>"]
 
 [dependencies]
+im = "12.2.0"

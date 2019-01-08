@@ -19,11 +19,11 @@ impl<T: Scalar<T>> Tensor<T> {
                 "Can't add tensors of different dimensions",
             ));
         }
-        let mut result = vec![];
+        let mut result = vector![];
         for i in 0..self.storage.elements.len() {
             let a = self.storage.elements[i].clone();
             let b = other.storage.elements[i].clone();
-            result.push(a + b);
+            result.push_back(a + b);
         }
         Ok(Tensor {
             storage: Rc::new(Storage { elements: result }),

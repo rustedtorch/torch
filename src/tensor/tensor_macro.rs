@@ -1,8 +1,10 @@
 use super::*;
+use im::Vector;
 
+#[derive(Clone)]
 pub enum Data<T> {
     Item(T),
-    Vector(Vec<Data<T>>),
+    Vector(Vector<Data<T>>),
 }
 
 pub fn flatten<T: Scalar<T>>(data: Data<T>) -> Tensor<T> {
@@ -10,13 +12,13 @@ pub fn flatten<T: Scalar<T>>(data: Data<T>) -> Tensor<T> {
     Tensor::new(flattened_data, dimensions)
 }
 
-pub fn flatten_recursive<T: Scalar<T>>(data: Data<T>) -> (Vec<T>, Vec<usize>) {
+pub fn flatten_recursive<T: Scalar<T>>(data: Data<T>) -> (Vector<T>, Vector<usize>) {
     match data {
-        Data::Item(item) => (vec![item], vec![]),
+        Data::Item(item) => (vector![item], vector![]),
         Data::Vector(vector) => {
-            let mut flattened_data = vec![];
+            let mut flattened_data = vector![];
             let mut current_inner_dimension = 0;
-            let mut dimensions = vec![vector.len()];
+            let mut dimensions = vector![vector.len()];
             let mut dimension_recorded = false;
             for item in vector {
                 let (inner_flattened_data, inner_dimensions) = flatten_recursive(item);
@@ -104,12 +106,12 @@ macro_rules! tensor_i16 {
 macro_rules! tensor_internal {
     // Done with trailing comma.
     ($type:ty, @array [$($elems:expr,)*]) => {
-       tensor_internal_vec![$($elems,)*]
+       tensor_internal_vector![$($elems,)*]
     };
 
     // Done without trailing comma.
     ($type:ty, @array [$($elems:expr),*]) => {
-        tensor_internal_vec![$($elems),*]
+        tensor_internal_vector![$($elems),*]
     };
 
     // Next element is an array.
@@ -151,9 +153,9 @@ macro_rules! tensor_internal {
 
 #[macro_export]
 #[doc(hidden)]
-macro_rules! tensor_internal_vec {
+macro_rules! tensor_internal_vector {
     ($($content:tt)*) => {
-        $crate::tensor::tensor_macro::Data::Vector(vec![$($content)*])
+        $crate::tensor::tensor_macro::Data::Vector(vector![$($content)*])
     };
 }
 

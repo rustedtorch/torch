@@ -5,12 +5,13 @@ pub mod scalar;
 pub mod tensor_macro;
 
 use self::scalar::*;
+use im::Vector;
 use std::rc::Rc;
 
 pub type Result<T> = std::result::Result<T, error::TensorError>;
 
 pub struct Storage<T: Scalar<T>> {
-    elements: Vec<T>,
+    elements: Vector<T>,
 }
 
 pub trait Function {
@@ -19,7 +20,7 @@ pub trait Function {
 
 pub struct Tensor<T: Scalar<T>> {
     storage: Rc<Storage<T>>,
-    dimensions: Vec<usize>,
+    dimensions: Vector<usize>,
     src_fn: Option<Box<Function>>,
 }
 
@@ -37,7 +38,7 @@ impl<T: Scalar<T>> Clone for Tensor<T> {
 }
 
 impl<T: Scalar<T>> Tensor<T> {
-    pub fn new(flattened_data: Vec<T>, dimensions: Vec<usize>) -> Tensor<T> {
+    pub fn new(flattened_data: Vector<T>, dimensions: Vector<usize>) -> Tensor<T> {
         Tensor {
             storage: Rc::new(Storage {
                 elements: flattened_data,
